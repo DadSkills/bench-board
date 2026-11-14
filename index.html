@@ -26,7 +26,8 @@ header{background:var(--surface);border-bottom:1px solid var(--line);flex:none}
 .brand i b{width:4px;border-radius:1px;background:var(--blue)}
 .brand i b:nth-child(2){background:var(--accent)}
 .savebox{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
-nav{display:grid;grid-template-columns:repeat(5,1fr);padding:0 6px}
+nav{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:0 6px}
+#mode button{min-height:34px;font-size:13px;padding:0 10px}
 nav button{background:none;border:0;border-bottom:3px solid transparent;padding:9px 2px 8px;font:600 17px/1 var(--display);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 nav button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 main{flex:1 1 0;min-height:0;overflow:auto}
@@ -235,7 +236,7 @@ function fmt(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%
 
 /* ---------- shell ---------- */
 $('#root').innerHTML=
-'<header><div class="top"><h1 class="brand"><i aria-hidden="true"><b></b><b></b><b></b></i>Bench Board</h1>'+
+'<header><div class="top"><h1 class="brand"><i aria-hidden="true"><b></b><b></b><b></b></i>Bench Board</h1><div class="seg" id="mode" role="group" aria-label="Game type"><button data-mode="full">Full ice</button><button data-mode="u9">U9 half ice</button></div>'+
 '<div class="savebox"><span id="saveNote">Saved on this device</span><button class="btn" id="cloudSave" hidden>Save for all devices</button></div></div>'+
 '<nav aria-label="Sections"><button data-v="board">Board</button><button data-v="roster">Roster</button><button data-v="lines">Lines</button><button data-v="shifts">Shifts</button><button data-v="u9">U9</button></nav></header>'+
 '<button id="navToggle" aria-expanded="false">Pages</button><main><section class="view" id="v-board">'+
@@ -257,8 +258,20 @@ $('#root').innerHTML=
 
 /* ---------- views / tabs ---------- */
 var VIEWS=['board','roster','lines','shifts','u9'],view='board';
+var MODE_HIDE={full:['u9'],u9:['lines','shifts']};
+function curMode(){return state.mode==='u9'?'u9':'full'}
+function applyMode(){
+  var m=curMode();
+  document.querySelectorAll('nav button').forEach(function(b){b.hidden=MODE_HIDE[m].indexOf(b.dataset.v)>=0});
+  document.querySelectorAll('#mode button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m)});
+}
+$('#mode').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;state.mode=b.dataset.mode;save();
+  var v=view;if(MODE_HIDE[curMode()].indexOf(v)>=0)v=curMode()==='u9'?'u9':'lines';
+  try{location.hash=v}catch(x){}show(v);
+});
 function show(v){
-  if(VIEWS.indexOf(v)<0)v='board';view=v;
+  if(VIEWS.indexOf(v)<0||MODE_HIDE[curMode()].indexOf(v)>=0)v='board';view=v;applyMode();
   VIEWS.forEach(function(n){$('#v-'+n).hidden=n!==v});
   document.querySelectorAll('nav button').forEach(function(b){b.setAttribute('aria-current',b.dataset.v===v?'true':'false')});
   if(v==='board'){renderChrome();layoutRink()}
