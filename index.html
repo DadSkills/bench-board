@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bench Board</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"><style id="css">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bench Board</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f1b2d"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"><style id="css">
 :root{
   /* layout: header with four tabs, one working view at a time; the rink fills whatever height is left */
   --bg:#e9eff6; --surface:#ffffff; --tint:#f2f6fa; --ink:#0f1b2d; --muted:#56667c; --line:#cfd9e6;
@@ -755,5 +755,6 @@ $('#cloudSave').addEventListener('click',function(){
 });
 
 show((location.hash||'').slice(1)||'board');
+if('serviceWorker' in navigator&&location.protocol==='https:'&&!window.claude){navigator.serviceWorker.register('sw.js').catch(function(){})}
 })();
 </script></body></html>
